@@ -1,4 +1,4 @@
-# Genie semantic skills
+# Genie Data Foundation skills
 
 Project-staged Genie Code skills for document-driven Unity Catalog enrichment.
 

@@ -1,8 +1,8 @@
-# Genie Semantic Curator
+# Genie Data Foundation
 
-Reusable Genie Code skills that turn documented data assets into governed Unity Catalog metadata, relationships, semantic views, and metric views.
+Reusable Genie Code skills that transform documented data assets and base tables into a governed Unity Catalog foundation: metadata, relationships, semantic views, and metrics.
 
-The project helps data teams prepare bronze or base tables for discovery and analytics when table definitions, business rules, keys, and metrics are described in vendor guides or internal data dictionaries.
+The project helps data teams go from bronze or base tables and data dictionaries through catalog curation to a semantic layer.
 
 ## What it does
 
@@ -10,14 +10,14 @@ The project helps data teams prepare bronze or base tables for discovery and ana
 Documents + Unity Catalog tables
               |
               v
-   Extract documented semantics
+   Prepare the data foundation
               |
               v
-  Match and validate catalog assets
+  Match, validate, and curate catalog assets
               |
               v
-Comments, tags, PK/FK proposals,
-semantic views, and metric views
+Comments, tags, PK/FK, views,
+and metric views (semantic layer)
 ```
 
 The workflow retains document-page evidence, validates key integrity and join cardinality, protects existing curated metadata, and supports dry runs before applying changes.

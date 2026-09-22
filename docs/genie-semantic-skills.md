@@ -1,6 +1,6 @@
-# Genie Semantic Skills
+# Genie Data Foundation
 
-A vendor-neutral suite of Genie Code agent skills that turn data documentation (such as vendor PDFs and data dictionaries) into governed Unity Catalog metadata, relationships, and semantic assets.
+A vendor-neutral suite of Genie Code agent skills that start from documented data assets and base tables, then build a governed Unity Catalog foundation through metadata, relationships, semantic views, and metrics.
 
 The suite is one orchestrator plus four specialist skills. Each specialist is callable on its own; the orchestrator runs them end to end.
 
