@@ -1,0 +1,27 @@
+name: Validate skills
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run policy tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python3 -m unittest discover -s .assistant/tests -p 'test_*.py' -v
+      - name: Validate skill structure
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python3 .assistant/tests/validate_skills.py
