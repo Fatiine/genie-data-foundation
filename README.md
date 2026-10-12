@@ -1,6 +1,6 @@
 # Genie Data Foundation
 
-Reusable Genie Code skills that transform documented data assets and base tables into a governed Unity Catalog foundation: metadata, relationships, semantic views, and metrics.
+Reusable Genie Code skills that transform documented data assets and base tables into a governed Unity Catalog foundation: metadata, relationships, semantic views, metrics, domain scope, and Genie benchmarks.
 
 The project helps data teams go from bronze or base tables and data dictionaries through catalog curation to a semantic layer.
 
@@ -20,7 +20,7 @@ Comments, tags, PK/FK, views,
 and metric views (semantic layer)
 ```
 
-The workflow retains document-page evidence, validates key integrity and join cardinality, protects existing curated metadata, and supports dry runs before applying changes.
+The workflow retains document-page evidence, validates key integrity and join cardinality, protects existing curated metadata, scopes realistic user questions, and supports dry runs before applying changes.
 
 ## Included skills
 
@@ -32,6 +32,7 @@ The workflow retains document-page evidence, validates key integrity and join ca
 | `@data-layout-auditor` | Audits liquid clustering, predictive optimization, partitions, files, and Delta maintenance |
 | `@catalog-metadata-publisher` | Publishes comments, tags, and informational PK/FK constraints |
 | `@semantic-view-builder` | Builds standard views and Unity Catalog metric views |
+| `@genie-benchmark-builder` | Scopes a domain from user questions and builds validated Genie benchmarks |
 
 ## Safety model
 
@@ -41,7 +42,8 @@ The workflow retains document-page evidence, validates key integrity and join ca
 - Requires complete duplicate, null, and orphan checks before publishing keys.
 - Treats Databricks PK/FK constraints as informational, not enforced.
 - Keeps data-layout changes review-only by default. `CLUSTER BY AUTO` applies only with an explicit `layout_mode=apply_approved` allow-list; maintenance DDL is never executed.
-- Writes applied SQL and rollback to an append-only ledger (`applied_actions.sql` plus a notebook) whenever a mutation succeeds.
+- Writes applied SQL or API mutations and rollback to an append-only ledger (`applied_actions.sql` plus a notebook) whenever a mutation succeeds.
+- Publishes only explicitly approved benchmark questions and preserves a complete before-state backup of the Genie Agent.
 - Never replaces a customer-owned view.
 - Sends ambiguous formulas, grains, joins, and mappings for review.
 

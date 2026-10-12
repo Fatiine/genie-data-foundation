@@ -78,6 +78,49 @@ class PolicyContractTests(unittest.TestCase):
         self.assertIn("applied-actions-ledger.md", publisher)
         self.assertIn("applied-actions-ledger.md", builder)
         self.assertIn("applied-actions-ledger.md", orchestrator)
+        self.assertIn("mutating API request", ledger)
+        self.assertIn("before/after JSON", ledger)
+
+    def test_benchmark_builder_requires_scope_and_review(self) -> None:
+        skill = read_skill("genie-benchmark-builder")
+        contract = read_skill("genie-benchmark-builder", "benchmark-contract.md")
+        self.assertIn("Default to `dry_run`", skill)
+        self.assertIn("Reject unbounded metastore discovery", skill)
+        self.assertIn("maximum 500 benchmark questions", skill)
+        for status in (
+            "`in_scope`",
+            "`partially_answerable`",
+            "`ambiguous`",
+            "`out_of_scope`",
+        ):
+            self.assertIn(status, skill)
+        self.assertIn("review_status: approved", skill)
+        self.assertIn("32-character hexadecimal", contract)
+        self.assertIn("Never persist raw result rows", contract)
+
+    def test_benchmark_publication_preserves_agent_configuration(self) -> None:
+        skill = read_skill("genie-benchmark-builder")
+        api = read_skill("genie-benchmark-builder", "api-templates.md")
+        orchestrator = read_skill("semantic-onboarding")
+        self.assertIn("apply_approved", skill)
+        self.assertIn("approved_question_ids", skill)
+        self.assertIn("preserve every unrelated serialized field", skill)
+        self.assertIn("genie_space.before.json", skill)
+        self.assertIn("rollback payload", skill)
+        self.assertIn("Never send a partial", api)
+        self.assertIn("If-Match", api)
+        self.assertIn("already_applied", api)
+        self.assertIn("Benchmark publication is never automatic", orchestrator)
+
+    def test_benchmark_ground_truth_is_validated_before_publish(self) -> None:
+        skill = read_skill("genie-benchmark-builder")
+        review = read_skill("genie-benchmark-builder", "benchmark-review.sql")
+        self.assertIn("Allow one read-only `SELECT` or `WITH`", skill)
+        self.assertIn("Parse or explain the SQL", skill)
+        self.assertIn("result signature", skill)
+        self.assertIn("A reviewer must set", skill)
+        self.assertIn("review_status: pending", review)
+        self.assertIn("do not publish", review.lower())
 
     def test_repeated_runs_are_idempotent(self) -> None:
         contract = read_skill("semantic-onboarding", "run-contract.md")

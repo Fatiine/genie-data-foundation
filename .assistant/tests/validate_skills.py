@@ -17,6 +17,7 @@ EXPECTED = {
     "data-layout-auditor",
     "catalog-metadata-publisher",
     "semantic-view-builder",
+    "genie-benchmark-builder",
 }
 NAME_PATTERN = re.compile(r"^[a-z0-9-]{1,64}$")
 LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -89,6 +90,30 @@ def main() -> int:
     ):
         if not (SKILLS / ledger_file).exists():
             errors.append(f"missing {ledger_file}")
+
+    benchmark_files = (
+        "benchmark-contract.md",
+        "api-templates.md",
+        "benchmark-review.sql",
+        "benchmark-review-notebook.py",
+    )
+    for benchmark_file in benchmark_files:
+        path = SKILLS / "genie-benchmark-builder" / benchmark_file
+        if not path.exists():
+            errors.append(f"missing benchmark artifact {benchmark_file}")
+
+    benchmark_notebook = (
+        SKILLS / "genie-benchmark-builder" / "benchmark-review-notebook.py"
+    )
+    if benchmark_notebook.exists():
+        try:
+            compile(
+                benchmark_notebook.read_text(encoding="utf-8"),
+                str(benchmark_notebook),
+                "exec",
+            )
+        except SyntaxError as exc:
+            errors.append(f"{benchmark_notebook}: {exc}")
 
     metric_template = (
         SKILLS / "semantic-view-builder" / "metric-view-template.md"

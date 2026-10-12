@@ -8,13 +8,17 @@
 # MAGIC - `started_at`:
 # MAGIC - SQL source of truth: `applied_actions.sql` in the same folder
 # MAGIC
-# MAGIC Cells below are the statements that succeeded. Rollback is in a later
-# MAGIC markdown/SQL section and must not be run unless requested.
+# MAGIC Cells below describe the SQL or API actions that succeeded. API actions
+# MAGIC reference redacted request metadata and before/after JSON artifacts.
+# MAGIC Rollback is in a later section and must not be run unless requested.
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Applied
+# MAGIC
+# MAGIC For API actions, record method/path, response status, before/after
+# MAGIC configuration hashes, and backup paths. Never include credentials.
 
 # COMMAND ----------
 

@@ -1,11 +1,11 @@
 ---
 name: semantic-onboarding
-description: Orchestrates document extraction, Unity Catalog profiling, data layout auditing, metadata enrichment, relationship validation, and semantic or metric view creation for any supplied documents and table scope. Use for end-to-end onboarding of vendor or internal data into Genie-ready semantics.
+description: Orchestrates document extraction, Unity Catalog profiling, data layout auditing, metadata enrichment, relationship validation, semantic assets, and optional question-driven Genie benchmarks. Use for end-to-end onboarding of vendor or internal data into Genie-ready semantics.
 ---
 
 # Semantic onboarding
 
-Run an evidence-first semantic onboarding workflow. This skill coordinates the same phases exposed by `document-schema-extractor`, `catalog-semantic-profiler`, `data-layout-auditor`, `catalog-metadata-publisher`, and `semantic-view-builder`.
+Run an evidence-first semantic onboarding workflow. This skill coordinates the same phases exposed by `document-schema-extractor`, `catalog-semantic-profiler`, `data-layout-auditor`, `catalog-metadata-publisher`, `semantic-view-builder`, and `genie-benchmark-builder`.
 
 ## Invocation
 
@@ -16,7 +16,7 @@ Collect these inputs:
 - `target_schema`: destination for generated views and metric views.
 - `mode`: default `dry_run`; allowed values are `dry_run`, `apply_approved`, and `auto_apply_high_confidence`.
 
-Optional: table name mappings, tag allow-list, output/control schema, maximum table count, profile limits, layout audit level, `layout_mode`, `allowed_layout_actions`, `approved_tables`, `ledger_path`, naming prefix, and desired asset types. `layout_mode` defaults to `dry_run` and is independent of metadata/view `mode`. When any mutation is applied, write the ledger described in [applied-actions-ledger.md](../applied-actions-ledger.md).
+Optional: table name mappings, tag allow-list, output/control schema, maximum table count, profile limits, layout audit level, `layout_mode`, `allowed_layout_actions`, `approved_tables`, question list, Genie `space_id`, approved benchmark question IDs, `ledger_path`, naming prefix, and desired asset types. `layout_mode` defaults to `dry_run` and is independent of metadata/view `mode`. When any mutation is applied, write the ledger described in [applied-actions-ledger.md](../applied-actions-ledger.md).
 
 Confirm the resolved source table list and target schema before any mutation. Do not accept an unbounded metastore-wide scope.
 
@@ -72,7 +72,17 @@ Confirm the resolved source table list and target schema before any mutation. Do
 - Validate join grain and formulas before creation.
 - Never replace an object not owned by this workflow.
 
-### 8. Verify and report
+### 8. Scope and build Genie benchmarks
+
+- Run only when a question list is supplied.
+- Follow `genie-benchmark-builder`.
+- Classify every question against the resolved data scope and generate
+  candidate ground-truth SQL only for unambiguous in-scope questions.
+- Benchmark publication requires a separate `apply_approved` request with
+  `space_id` and approved question IDs. Metadata or view
+  `auto_apply_high_confidence` never publishes benchmarks.
+
+### 9. Verify and report
 
 - Re-read metadata and query created assets.
 - Record before/after state, validation results, definition hashes, and rollback SQL.
@@ -89,6 +99,9 @@ Automatic means no per-action confirmation after the caller selects `auto_apply_
   `layout_mode=apply_approved` with an explicit allow-list and approved tables.
   Never run `OPTIMIZE`, `VACUUM`, `ANALYZE`, `REORG`, partition conversion, or
   predictive-optimization enablement from this workflow.
+- Benchmark publication is never automatic. It requires approved question IDs,
+  reviewed ground-truth SQL, a matching live agent version, and a preserved
+  before-state rollback payload.
 - Formula ambiguity, unknown aggregation, uncertain grain, failed OCR, sampled-only key checks, or conflicting documentation always requires review.
 
 ## Failure behavior
@@ -106,6 +119,7 @@ Keep the summary short:
 - actions applied, proposed, skipped, conflicted, and failed
 - views/metric views created
 - data-layout findings, proposed optimizations, and any applied `CLUSTER BY AUTO` actions
+- benchmark domain coverage, artifact paths, publication, and evaluation status
 - validations performed
 - location of the detailed report, applied-actions SQL/notebook ledger, and rollback SQL
 - next approvals required

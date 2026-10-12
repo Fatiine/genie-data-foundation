@@ -2,7 +2,7 @@
 
 A vendor-neutral suite of Genie Code agent skills that start from documented data assets and base tables, then build a governed Unity Catalog foundation through metadata, relationships, semantic views, and metrics.
 
-The suite is one orchestrator plus five specialist skills. Each specialist is callable on its own; the orchestrator runs them end to end.
+The suite is one orchestrator plus six specialist skills. Each specialist is callable on its own; the orchestrator runs them end to end.
 
 ## Skills
 
@@ -16,7 +16,8 @@ Runs the complete workflow:
 4. Audits liquid clustering, predictive optimization, and data layout.
 5. Proposes or applies descriptions, tags, primary keys, and foreign keys.
 6. Creates semantic views and metric views.
-7. Produces validation results and rollback SQL.
+7. Optionally scopes a Genie domain and builds benchmarks from user questions.
+8. Produces validation results and rollback artifacts.
 
 Prerequisites:
 - Document paths
@@ -157,6 +158,27 @@ Prerequisites:
 
 Does not assume every numeric field should be summed. Metric formulas and aggregation behavior must be documented or explicitly approved.
 
+### 7. `@genie-benchmark-builder`
+
+Turns a supplied question list into a reviewed Genie benchmark set:
+
+- Classifies questions as in scope, partial, ambiguous, or out of scope
+- Maps questions to tables, columns, joins, measures, filters, and grain
+- Recommends a focused domain scope
+- Generates and validates candidate ground-truth SQL
+- Publishes only explicitly approved benchmarks to an existing Genie Agent
+- Optionally runs a baseline chat-mode evaluation
+
+Benchmarks are evaluation-only and do not become Genie instructions or example
+SQL. Publication preserves the full existing agent configuration, writes a
+before-state backup, and records rollback metadata.
+
+Prerequisites:
+- Question list and bounded source tables or existing Genie Agent data sources
+- SQL warehouse for ground-truth validation
+- Existing Genie `space_id` and edit permission for publication
+- Explicit review and approved question IDs
+
 ## Document support
 
 With Databricks `ai_parse_document`:
@@ -196,6 +218,7 @@ Document quality matters: unclear or poorly structured documentation produces re
     data-layout-auditor/
     catalog-metadata-publisher/
     semantic-view-builder/
+    genie-benchmark-builder/
     README.md
   tests/
     validate_skills.py

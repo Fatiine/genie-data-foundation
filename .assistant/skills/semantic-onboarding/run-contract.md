@@ -14,6 +14,9 @@ Mode: dry_run
 Create: comments, tags, relationships, views, metric views
 Audit: liquid clustering, predictive optimization, data layout
 Layout mode: dry_run
+Questions: /Volumes/vendor_docs/guides/fundamentals_questions.csv
+Genie space ID: <space_id>
+Benchmark mode: dry_run
 ```
 
 Use `Mode: auto_apply_high_confidence` only after a successful dry run establishes the expected mappings and target schema. Layout DDL still requires a separate `Layout mode: apply_approved` with `Allowed layout actions: cluster_by_auto` and an approved table list.
@@ -45,6 +48,10 @@ Persist or return:
   "extraction_summary": {},
   "catalog_snapshot": {},
   "data_layout_audit": {},
+  "benchmark_scope": {},
+  "benchmark_artifacts": {},
+  "genie_publication": {},
+  "benchmark_evaluation": {},
   "proposals": [],
   "applied_actions": [],
   "validation_results": [],

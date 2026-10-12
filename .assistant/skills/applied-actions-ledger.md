@@ -1,7 +1,7 @@
 # Applied-actions ledger
 
-When any skill executes mutating SQL, persist an append-only ledger before
-reporting success. Dry runs do not write a ledger.
+When any skill executes mutating SQL or a mutating API request, persist an
+append-only ledger before reporting success. Dry runs do not write a ledger.
 
 ## Destination
 
@@ -17,20 +17,23 @@ filenames there. Do not overwrite an existing file; append a new run section.
 If workspace write fails, keep the full ledger in the response and mark
 `ledger_status: not_persisted`.
 
-## Required SQL file
+## Required ledger file
 
 Use [applied-actions-ledger.sql](applied-actions-ledger.sql). Each applied
-statement needs:
+action needs:
 
 - `run_id`, skill, mode, timestamp, operator
 - fully qualified target
-- action name and proposal id
+- action kind (`sql` or `api`), action name, and proposal id
 - before/after state
-- executed SQL
+- executed SQL, or API method/path and redacted request metadata
 - verification result
-- rollback SQL
+- rollback SQL or rollback API payload path
 
-Put rollback statements in reverse apply order in a commented `ROLLBACK`
+For API updates, persist before/after JSON and configuration hashes alongside
+the ledger. Never store credentials, bearer tokens, or sensitive headers.
+
+Put rollback operations in reverse apply order in a commented `ROLLBACK`
 section. Never execute rollback unless the caller requests it.
 
 ## Optional notebook
@@ -43,7 +46,7 @@ file is the source of truth.
 
 - Write the ledger after each successful statement, or atomically after the
   apply batch if that is safer.
-- Include failed attempts with `status: failed` and the error; do not put
-  failed SQL in the executable apply section.
+- Include failed attempts with `status: failed` and the error; do not put failed
+  SQL or API calls in the executable apply section.
 - `already_applied` and skipped actions are comments only.
 - Return the ledger path in the skill summary.
