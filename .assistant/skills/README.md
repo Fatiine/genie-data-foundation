@@ -7,10 +7,13 @@ Project-staged Genie Code skills for document-driven Unity Catalog enrichment.
 - `@semantic-onboarding`: complete workflow
 - `@document-schema-extractor`: document evidence only
 - `@catalog-semantic-profiler`: read-only catalog and data checks
+- `@data-layout-auditor`: liquid clustering, predictive optimization, and Delta layout audit; optional approved `CLUSTER BY AUTO`
 - `@catalog-metadata-publisher`: comments, tags, and informational constraints
 - `@semantic-view-builder`: standard views and metric views
 
 Start with `dry_run`. Each skill accepts document/table inputs at invocation time, so no vendor or catalog names are hard-coded.
+
+Applied mutations are written to `applied_actions.sql` and `applied_actions.py` under `/Workspace/.assistant/runs/<run_id>/`, or to `ledger_path` when supplied.
 
 ## Install in Databricks
 

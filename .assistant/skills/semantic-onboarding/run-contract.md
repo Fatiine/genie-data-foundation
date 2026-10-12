@@ -12,9 +12,11 @@ Tables:
 Target schema: finance_semantic.factset
 Mode: dry_run
 Create: comments, tags, relationships, views, metric views
+Audit: liquid clustering, predictive optimization, data layout
+Layout mode: dry_run
 ```
 
-Use `Mode: auto_apply_high_confidence` only after a successful dry run establishes the expected mappings and target schema.
+Use `Mode: auto_apply_high_confidence` only after a successful dry run establishes the expected mappings and target schema. Layout DDL still requires a separate `Layout mode: apply_approved` with `Allowed layout actions: cluster_by_auto` and an approved table list.
 
 ## Pattern prompt
 
@@ -42,6 +44,7 @@ Persist or return:
   "runtime_capabilities": {},
   "extraction_summary": {},
   "catalog_snapshot": {},
+  "data_layout_audit": {},
   "proposals": [],
   "applied_actions": [],
   "validation_results": [],
@@ -49,6 +52,8 @@ Persist or return:
   "conflicts": [],
   "failures": [],
   "rollback_sql": [],
+  "ledger_path": "/Workspace/.assistant/runs/<run_id>/applied_actions.sql",
+  "ledger_notebook_path": "/Workspace/.assistant/runs/<run_id>/applied_actions.py",
   "status": "completed_with_review"
 }
 ```

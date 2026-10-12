@@ -1,11 +1,11 @@
 ---
 name: semantic-onboarding
-description: Orchestrates document extraction, Unity Catalog profiling, metadata enrichment, relationship validation, and semantic or metric view creation for any supplied documents and table scope. Use for end-to-end onboarding of vendor or internal data into Genie-ready semantics.
+description: Orchestrates document extraction, Unity Catalog profiling, data layout auditing, metadata enrichment, relationship validation, and semantic or metric view creation for any supplied documents and table scope. Use for end-to-end onboarding of vendor or internal data into Genie-ready semantics.
 ---
 
 # Semantic onboarding
 
-Run an evidence-first semantic onboarding workflow. This skill coordinates the same phases exposed by `document-schema-extractor`, `catalog-semantic-profiler`, `catalog-metadata-publisher`, and `semantic-view-builder`.
+Run an evidence-first semantic onboarding workflow. This skill coordinates the same phases exposed by `document-schema-extractor`, `catalog-semantic-profiler`, `data-layout-auditor`, `catalog-metadata-publisher`, and `semantic-view-builder`.
 
 ## Invocation
 
@@ -16,7 +16,7 @@ Collect these inputs:
 - `target_schema`: destination for generated views and metric views.
 - `mode`: default `dry_run`; allowed values are `dry_run`, `apply_approved`, and `auto_apply_high_confidence`.
 
-Optional: table name mappings, tag allow-list, output/control schema, maximum table count, profile limits, naming prefix, and desired asset types.
+Optional: table name mappings, tag allow-list, output/control schema, maximum table count, profile limits, layout audit level, `layout_mode`, `allowed_layout_actions`, `approved_tables`, `ledger_path`, naming prefix, and desired asset types. `layout_mode` defaults to `dry_run` and is independent of metadata/view `mode`. When any mutation is applied, write the ledger described in [applied-actions-ledger.md](../applied-actions-ledger.md).
 
 Confirm the resolved source table list and target schema before any mutation. Do not accept an unbounded metastore-wide scope.
 
@@ -47,21 +47,32 @@ Confirm the resolved source table list and target schema before any mutation. Do
 - Materialize a run report following [run-contract.md](run-contract.md).
 - Separate eligible, review-required, conflict, invalid, and already-applied actions.
 
-### 5. Publish metadata
+### 5. Audit data layout
+
+- Follow `data-layout-auditor`.
+- Record liquid clustering, predictive optimization, partitions, file layout,
+  and maintenance evidence for the resolved source tables.
+- Default to layout proposals only. `auto_apply_high_confidence` never applies
+  layout DDL.
+- Apply `CLUSTER BY AUTO` only when `layout_mode` is `apply_approved`,
+  `allowed_layout_actions` contains `cluster_by_auto`, and each target is in
+  `approved_tables` and passes the auditor eligibility gates.
+
+### 6. Publish metadata
 
 - Follow `catalog-metadata-publisher`.
 - In `dry_run`, execute no DDL.
 - In `apply_approved`, apply only proposal IDs supplied by the user.
 - In `auto_apply_high_confidence`, apply only actions passing all type-specific thresholds.
 
-### 6. Build semantic assets
+### 7. Build semantic assets
 
 - Follow `semantic-view-builder`.
 - Build views only in `target_schema`.
 - Validate join grain and formulas before creation.
 - Never replace an object not owned by this workflow.
 
-### 7. Verify and report
+### 8. Verify and report
 
 - Re-read metadata and query created assets.
 - Record before/after state, validation results, definition hashes, and rollback SQL.
@@ -74,6 +85,10 @@ Automatic means no per-action confirmation after the caller selects `auto_apply_
 - Comments/tags require confidence `>= 0.95`, exact unambiguous target, explicit evidence, and no curated conflict.
 - PK/FK publication requires explicit document declaration at confidence `1.00` plus complete integrity checks. Never alter nullability automatically.
 - Views/metric views require valid syntax, successful preview, validated joins, explicit target schema, and a free or workflow-owned target name.
+- Data-layout DDL is never automatic. `CLUSTER BY AUTO` may run only through
+  `layout_mode=apply_approved` with an explicit allow-list and approved tables.
+  Never run `OPTIMIZE`, `VACUUM`, `ANALYZE`, `REORG`, partition conversion, or
+  predictive-optimization enablement from this workflow.
 - Formula ambiguity, unknown aggregation, uncertain grain, failed OCR, sampled-only key checks, or conflicting documentation always requires review.
 
 ## Failure behavior
@@ -90,8 +105,9 @@ Keep the summary short:
 - documents/pages and tables covered
 - actions applied, proposed, skipped, conflicted, and failed
 - views/metric views created
+- data-layout findings, proposed optimizations, and any applied `CLUSTER BY AUTO` actions
 - validations performed
-- location of the detailed report and rollback SQL
+- location of the detailed report, applied-actions SQL/notebook ledger, and rollback SQL
 - next approvals required
 
 For examples and the run record, see [run-contract.md](run-contract.md).

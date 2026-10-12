@@ -46,6 +46,39 @@ class PolicyContractTests(unittest.TestCase):
         self.assertIn("full-data orphan count is zero", publisher)
         self.assertIn("types and column order match", publisher)
 
+    def test_layout_auditor_is_read_only_and_evidence_based(self) -> None:
+        auditor = read_skill("data-layout-auditor")
+        templates = read_skill("data-layout-auditor", "sql-templates.md")
+        orchestrator = read_skill("semantic-onboarding")
+        self.assertIn("Default `layout_mode` is", auditor)
+        self.assertIn("`dry_run`", auditor)
+        self.assertIn("not_observable", auditor)
+        self.assertIn("clusteringColumns", auditor)
+        self.assertIn("Predictive Optimization", templates)
+        self.assertIn(
+            "system.storage.predictive_optimization_operations_history",
+            templates,
+        )
+        self.assertIn("CLUSTER BY AUTO", auditor)
+        self.assertIn("apply_approved", auditor)
+        self.assertIn("approved_tables", auditor)
+        self.assertIn("`auto_apply_high_confidence` is not a", auditor)
+        self.assertIn("Data-layout DDL is never automatic", orchestrator)
+        self.assertIn("Never run `OPTIMIZE`", auditor)
+        self.assertIn("applied-actions-ledger.md", auditor)
+
+    def test_applied_actions_are_written_to_a_ledger(self) -> None:
+        ledger = (SKILLS / "applied-actions-ledger.md").read_text(encoding="utf-8")
+        publisher = read_skill("catalog-metadata-publisher")
+        builder = read_skill("semantic-view-builder")
+        orchestrator = read_skill("semantic-onboarding")
+        self.assertIn("applied_actions.sql", ledger)
+        self.assertIn("applied_actions.py", ledger)
+        self.assertIn("Dry runs do not write a ledger", ledger)
+        self.assertIn("applied-actions-ledger.md", publisher)
+        self.assertIn("applied-actions-ledger.md", builder)
+        self.assertIn("applied-actions-ledger.md", orchestrator)
+
     def test_repeated_runs_are_idempotent(self) -> None:
         contract = read_skill("semantic-onboarding", "run-contract.md")
         self.assertIn("Treat an exact existing state as `already_applied`", contract)

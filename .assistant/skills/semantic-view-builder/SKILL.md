@@ -73,6 +73,9 @@ After apply:
 - verify comments/tags
 - run one dimension-only and one measure query
 - record the definition hash and rollback (`DROP VIEW`) statement
+- persist applied, failed, and already-applied statements to the ledger in
+  [applied-actions-ledger.md](../applied-actions-ledger.md). Optional
+  `ledger_path` overrides the default `/Workspace/.assistant/runs/<run_id>/`.
 
 ## Output
 

@@ -49,6 +49,9 @@ Use templates in [sql-templates.md](sql-templates.md).
 4. Execute one proposal at a time and record its result.
 5. Re-query information schema to verify the outcome.
 6. A failed action must not cause later dependent actions to run.
+7. Persist applied, failed, and already-applied statements to the ledger in
+   [applied-actions-ledger.md](../applied-actions-ledger.md). Optional
+   `ledger_path` overrides the default `/Workspace/.assistant/runs/<run_id>/`.
 
 PK, FK, and unique constraints in Databricks are informational and require Delta/Unity Catalog support. State this in the report.
 
@@ -64,4 +67,4 @@ Return applied, skipped, conflicted, failed, and review-required actions. Each r
 - before/after state
 - rollback SQL when applicable
 
-Never report success without post-application verification.
+Never report success without post-application verification and the ledger path.

@@ -2,7 +2,7 @@
 
 A vendor-neutral suite of Genie Code agent skills that start from documented data assets and base tables, then build a governed Unity Catalog foundation through metadata, relationships, semantic views, and metrics.
 
-The suite is one orchestrator plus four specialist skills. Each specialist is callable on its own; the orchestrator runs them end to end.
+The suite is one orchestrator plus five specialist skills. Each specialist is callable on its own; the orchestrator runs them end to end.
 
 ## Skills
 
@@ -13,9 +13,10 @@ Runs the complete workflow:
 1. Reads the supplied documents.
 2. Scans the selected Unity Catalog tables.
 3. Matches documented tables/columns to catalog objects.
-4. Proposes or applies descriptions, tags, primary keys, and foreign keys.
-5. Creates semantic views and metric views.
-6. Produces validation results and rollback SQL.
+4. Audits liquid clustering, predictive optimization, and data layout.
+5. Proposes or applies descriptions, tags, primary keys, and foreign keys.
+6. Creates semantic views and metric views.
+7. Produces validation results and rollback SQL.
 
 Prerequisites:
 - Document paths
@@ -81,7 +82,30 @@ Two profiling levels:
 - `metadata`: catalog metadata only
 - `bounded_data`: also validates candidate keys and relationships using data
 
-### 4. `@catalog-metadata-publisher`
+### 4. `@data-layout-auditor`
+
+Audits physical layout and maintenance:
+
+- Liquid clustering state, keys, and automatic key selection
+- Effective predictive optimization state and inheritance
+- Partition columns, table size, file count, and file-size signals
+- Recent compaction, clustering, statistics, and vacuum activity
+- Legacy `ZORDER` and overlapping scheduled maintenance
+- Delta properties, deletion vectors, retention, and data-skipping settings
+
+Defaults to proposals. It never runs `OPTIMIZE`, `VACUUM`, `ANALYZE`, `REORG`,
+or predictive-optimization enablement. The only optional apply path is
+`CLUSTER BY AUTO` when `layout_mode` is `apply_approved` and tables are
+explicitly approved.
+
+Prerequisites:
+- Explicit table list or a bounded catalog/schema pattern
+- `USE CATALOG`, `USE SCHEMA`, and metadata visibility
+- `SELECT` for optional data checks
+- Access to Delta history for maintenance analysis
+- Optional access to `system.storage.predictive_optimization_operations_history`
+
+### 5. `@catalog-metadata-publisher`
 
 Publishes validated metadata:
 
@@ -112,7 +136,7 @@ Automatic publication requires:
 - Zero FK orphans
 - Compatible datatypes
 
-### 5. `@semantic-view-builder`
+### 6. `@semantic-view-builder`
 
 Creates analytics-friendly assets:
 
@@ -159,6 +183,7 @@ Document quality matters: unclear or poorly structured documentation produces re
 - Ambiguous relationships and formulas require review.
 - Excel and CSV documentation are not currently supported by the extractor.
 - The skills are staged locally; they must be copied to `Workspace/.assistant/skills/` before Genie Code can use them.
+- Applied mutations are recorded in `/Workspace/.assistant/runs/<run_id>/applied_actions.sql` and a sibling notebook, unless `ledger_path` is supplied.
 
 ## Repository layout
 
@@ -168,6 +193,7 @@ Document quality matters: unclear or poorly structured documentation produces re
     semantic-onboarding/
     document-schema-extractor/
     catalog-semantic-profiler/
+    data-layout-auditor/
     catalog-metadata-publisher/
     semantic-view-builder/
     README.md

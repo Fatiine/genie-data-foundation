@@ -14,6 +14,7 @@ EXPECTED = {
     "semantic-onboarding",
     "document-schema-extractor",
     "catalog-semantic-profiler",
+    "data-layout-auditor",
     "catalog-metadata-publisher",
     "semantic-view-builder",
 }
@@ -80,6 +81,14 @@ def main() -> int:
             compile(extractor.read_text(encoding="utf-8"), str(extractor), "exec")
         except SyntaxError as exc:
             errors.append(f"{extractor}: {exc}")
+
+    for ledger_file in (
+        "applied-actions-ledger.md",
+        "applied-actions-ledger.sql",
+        "applied-actions-notebook.py",
+    ):
+        if not (SKILLS / ledger_file).exists():
+            errors.append(f"missing {ledger_file}")
 
     metric_template = (
         SKILLS / "semantic-view-builder" / "metric-view-template.md"

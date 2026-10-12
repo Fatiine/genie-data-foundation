@@ -29,6 +29,7 @@ The workflow retains document-page evidence, validates key integrity and join ca
 | `@semantic-onboarding` | Runs the complete document-to-semantic-layer workflow |
 | `@document-schema-extractor` | Extracts tables, fields, definitions, keys, formulas, and citations |
 | `@catalog-semantic-profiler` | Profiles Unity Catalog metadata and validates key candidates |
+| `@data-layout-auditor` | Audits liquid clustering, predictive optimization, partitions, files, and Delta maintenance |
 | `@catalog-metadata-publisher` | Publishes comments, tags, and informational PK/FK constraints |
 | `@semantic-view-builder` | Builds standard views and Unity Catalog metric views |
 
@@ -39,6 +40,8 @@ The workflow retains document-page evidence, validates key integrity and join ca
 - Never overwrites conflicting curated comments or governed tags automatically.
 - Requires complete duplicate, null, and orphan checks before publishing keys.
 - Treats Databricks PK/FK constraints as informational, not enforced.
+- Keeps data-layout changes review-only by default. `CLUSTER BY AUTO` applies only with an explicit `layout_mode=apply_approved` allow-list; maintenance DDL is never executed.
+- Writes applied SQL and rollback to an append-only ledger (`applied_actions.sql` plus a notebook) whenever a mutation succeeds.
 - Never replaces a customer-owned view.
 - Sends ambiguous formulas, grains, joins, and mappings for review.
 
@@ -65,6 +68,7 @@ Tables:
 Target schema: customer_catalog.semantic
 Mode: dry_run
 Create: comments, tags, relationships, views, metric views
+Audit: liquid clustering, predictive optimization, data layout
 ```
 
 Review the generated evidence and proposals. When the mapping is correct, rerun with:
